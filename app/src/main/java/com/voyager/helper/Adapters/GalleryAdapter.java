@@ -4,17 +4,32 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.voyager.helper.MainActivity;
+import com.bumptech.glide.Glide;
 import com.voyager.helper.R;
+
+import java.util.List;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
-    Context context;
+    private Context context;
+    private List<String> images;
+    private List<String> imagesName;
+    protected PhotoListner photoListner;
+
+
+    public GalleryAdapter(Context context, List<String> images,List<String> imagesName, PhotoListner photoListner) {
+        this.context = context;
+        this.images = images;
+        this.photoListner = photoListner;
+        this.imagesName=imagesName;
+    }
 
     public GalleryAdapter(Context context) {
         this.context = context;
@@ -30,22 +45,46 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.ImageView_individual.setImageResource(R.drawable.ic_launcher_foreground);
+//        String image=images.get(position);
+        Glide.with(context)
+                .load(images.get(position))
+                .placeholder(R.drawable.ic_launcher_foreground)
+                .into(holder.ImageView_individual)
+        ;
+
+        holder.fileName.setText(imagesName.get(position));
+
+        holder.shareButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                photoListner.onShareButtonClicked("Share");
+            }
+        });
     }
 
     @Override
     public int getItemCount() {
-        return 15;
+        return images.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
         ImageView ImageView_individual;
+        TextView fileName;
+        ImageButton shareButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             ImageView_individual = itemView.findViewById(R.id.image_gallery);
+            fileName=itemView.findViewById(R.id.file_name);
+            shareButton=itemView.findViewById(R.id.share_button);
+
         }
     }
+
+    public interface PhotoListner {
+        void onShareButtonClicked(String path);
+    }
+
 }

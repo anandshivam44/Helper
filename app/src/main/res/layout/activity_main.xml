@@ -15,62 +15,9 @@
 
         />
 
-    <com.getbase.floatingactionbutton.FloatingActionsMenu
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
-        app:fab_addButtonColorNormal="@color/colorAccent"
-        app:fab_addButtonColorPressed="@color/colorAccentPressed"
-        app:fab_addButtonPlusIconColor="@color/white"
-
-
-        app:fab_labelStyle="@style/fab_labels_style"
-        app:fab_labelsPosition="left"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_camera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_colorNormal="@color/action_color"
-            app:fab_colorPressed="@color/action_color_pressed"
-            app:fab_icon="@drawable/ic_camera_alt_white_48dp"
-            app:fab_size="mini"
-            app:fab_title="Photo" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_checklist"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_colorNormal="@color/colorPrimary"
-            app:fab_colorPressed="@color/colorPrimaryDark"
-            app:fab_icon="@drawable/ic_format_list_bulleted_white_48dp"
-            app:fab_size="mini"
-            app:fab_title="Checklist" />
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_checklist_2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_colorNormal="@color/colorPrimary"
-            app:fab_colorPressed="@color/colorPrimaryDark"
-            app:fab_icon="@drawable/ic_format_list_bulleted_white_48dp"
-            app:fab_size="mini"
-            app:fab_title="Checklist" />
-
-        <com.getbase.floatingactionbutton.FloatingActionButton
-            android:id="@+id/fab_note"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:fab_colorNormal="@color/colorAccent"
-            app:fab_colorPressed="@color/colorAccentPressed"
-            app:fab_icon="@drawable/ic_file_document_box_white_48dp"
-            app:fab_size="mini"
-            app:fab_title="Text note" />
-
-    </com.getbase.floatingactionbutton.FloatingActionsMenu>
+    <include
+        android:id="@+id/expanded_image"
+        layout="@layout/fab"
+        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

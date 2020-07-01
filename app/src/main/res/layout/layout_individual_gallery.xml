@@ -1,31 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:elevation="7dp"
     android:animateLayoutChanges="true"
+    android:elevation="7dp"
 
     >
 
     <RelativeLayout
-        android:animateLayoutChanges="true"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
 
 
         <ImageView
-            android:animateLayoutChanges="true"
             android:id="@+id/image_gallery"
             android:layout_width="match_parent"
-            android:layout_centerInParent="true"
-            android:src="@mipmap/ic_launcher_round"
-
             android:layout_height="wrap_content"
-            android:scaleType="fitCenter"
+            android:layout_centerInParent="true"
             android:adjustViewBounds="true"
 
+            android:animateLayoutChanges="true"
+            android:scaleType="centerCrop"
+            android:src="@mipmap/ic_launcher_round"
+
             />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:background="@color/file_name">
+
+            <TextView
+                android:id="@+id/file_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+
+                android:autoSizeTextType="uniform"
+                android:maxLines="1"
+                android:text="FileName"
+                android:gravity="center_vertical"
+                android:textColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/share_button"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <ImageButton
+                android:id="@+id/share_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="5dp"
+
+                android:background="@color/transparent"
+                android:src="@drawable/vector_share"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </RelativeLayout>
 
 </androidx.cardview.widget.CardView>
