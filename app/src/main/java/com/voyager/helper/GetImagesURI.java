@@ -7,7 +7,7 @@ import android.provider.MediaStore;
 
 import java.util.ArrayList;
 
-public class ImagesGallery {
+public class GetImagesURI {
     public static ArrayList<String> listOfImages(Context context) {
 
         Uri uri;

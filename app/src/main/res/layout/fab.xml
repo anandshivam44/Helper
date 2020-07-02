@@ -18,44 +18,35 @@
     app:layout_constraintEnd_toEndOf="parent">
 
     <com.getbase.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_camera"
+        android:id="@+id/fab_item_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:fab_colorNormal="@color/action_color"
         app:fab_colorPressed="@color/action_color_pressed"
-        app:fab_icon="@drawable/ic_camera_alt_white_48dp"
+        app:fab_icon="@drawable/vector_image"
         app:fab_size="mini"
-        app:fab_title="Photo" />
+        app:fab_title="Work with Photos" />
 
     <com.getbase.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_checklist"
+        android:id="@+id/fab_item_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:fab_colorNormal="@color/colorPrimary"
         app:fab_colorPressed="@color/colorPrimaryDark"
         app:fab_icon="@drawable/ic_format_list_bulleted_white_48dp"
         app:fab_size="mini"
-        app:fab_title="Checklist" />
+        app:fab_title="Exclusive for Signatures" />
+
 
     <com.getbase.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_checklist_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:fab_colorNormal="@color/colorPrimary"
-        app:fab_colorPressed="@color/colorPrimaryDark"
-        app:fab_icon="@drawable/ic_format_list_bulleted_white_48dp"
-        app:fab_size="mini"
-        app:fab_title="Checklist" />
-
-    <com.getbase.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_note"
+        android:id="@+id/fab_item_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:fab_colorNormal="@color/colorAccent"
         app:fab_colorPressed="@color/colorAccentPressed"
         app:fab_icon="@drawable/ic_file_document_box_white_48dp"
         app:fab_size="mini"
-        app:fab_title="Text note" />
+        app:fab_title="Miscellaneous" />
 
 </com.getbase.floatingactionbutton.FloatingActionsMenu>
 

@@ -1,24 +1,24 @@
 package com.voyager.helper;
 
 import android.Manifest;
-import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
-import androidx.loader.content.CursorLoader;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.getbase.floatingactionbutton.FloatingActionButton;
+import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.voyager.helper.Adapters.GalleryAdapter;
 
 import java.io.File;
@@ -27,13 +27,17 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MyTag";
     @BindView(R.id.recyclerView_grid)
     RecyclerView recyclerViewGrid;
+    //    Fab fab;
+    FloatingActionsMenu fabView;
+    FloatingActionButton fab1;
+    FloatingActionButton fab2;
+    FloatingActionButton fab3;
 
     List<String> images = new ArrayList<>();
     List<String> imageName = new ArrayList<>();
@@ -50,6 +54,29 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        fabView = findViewById(R.id.expanded_image);
+        fab1 = findViewById(R.id.fab_item_1);
+        fab1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Item_1 Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        fab2 = findViewById(R.id.fab_item_2);
+        fab2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Item_2 Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+        fab3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, "Item_3 Clicked", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         handlePermission();
 
 
@@ -57,8 +84,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void handlePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
-            {
+            if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(
                         new String[]{
                                 android.Manifest.permission.WRITE_EXTERNAL_STORAGE,
@@ -89,53 +115,32 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadImages() {
 
-        tryThis();
+        getURIofImages();
 
         recyclerViewGrid.hasFixedSize();
+        recyclerViewGrid.addItemDecoration(new DividerItemDecoration(this,
+                DividerItemDecoration.VERTICAL));//pending work
         recyclerViewGrid.setLayoutManager(new GridLayoutManager(MainActivity.this, 2));
-        adapter = new GalleryAdapter(MainActivity.this, images,imageName, new GalleryAdapter.PhotoListner() {
+        adapter = new GalleryAdapter(MainActivity.this, images, imageName, new GalleryAdapter.PhotoListner() {
             @Override
             public void onShareButtonClicked(String path) {
                 Toast.makeText(MainActivity.this, "Clicked " + path, Toast.LENGTH_SHORT).show();
             }
         });
-//        images= ImagesGallery.listOfImages(this);
         recyclerViewGrid.setAdapter(adapter);
-//        getImages();
-//        tryThis();
     }
 
-    private void tryThis() {
-//        String path = Environment.getExternalStorageDirectory().toString()+"/" ;
-//        Log.d("Files", "Path: " + path);
-//        File directory = new File(path);
-//        File[] files = directory.listFiles();
-////        Log.d("Files","Size: "+files.length);
-//        for (int i = 0; i < files.length; i++) {
-//            Log.d(TAG, "FileName:" + files[i].getName());
-//        }
+    private void getURIofImages() {
 
-        String parentDir = Environment.getExternalStorageDirectory().toString()+File.separator+"testfolder";
-        List<File> trying=getListFiles(new File(parentDir));
-        if (trying.size()>0){
-            for (int i=0;i<trying.size();i++){
-                Log.d(TAG, "Name "+trying.get(i).getName()+" Absolute Path "+trying.get(i).getAbsolutePath()+" URI= "+trying.get(i).toURI());
+        String parentDir = Environment.getExternalStorageDirectory().toString() + File.separator + "testfolder";
+        List<File> trying = getListFiles(new File(parentDir));
+        if (trying.size() > 0) {
+            for (int i = 0; i < trying.size(); i++) {
+                Log.d(TAG, "Name " + trying.get(i).getName() + " Absolute Path " + trying.get(i).getAbsolutePath() + " URI= " + trying.get(i).toURI());
                 images.add(trying.get(i).toURI().toString());
                 imageName.add(trying.get(i).getName());
             }
         }
-
-
-//        ArrayList<File> inFiles = new ArrayList<File>();
-//            File[] files = parentDir.listFiles();
-//            for (File file : files) {
-//                if (file.isDirectory()) {
-//                    inFiles.addAll(getListFiles(file));
-//                } else {
-//                    inFiles.add(file);
-//                }
-//            }
-
 
     }
 
@@ -152,32 +157,32 @@ public class MainActivity extends AppCompatActivity {
         return inFiles;
     }
 
-    private void getImages() {
-        Log.d(TAG, "getImages: ");
-        String uri = MediaStore.Images.Media.DATA;
-        // if GetImageFromThisDirectory is the name of the directory from which image will be retrieved
-        String condition = uri + "/testfolder";
-        String[] projection = {uri, MediaStore.Images.Media.DATE_ADDED,
-                MediaStore.Images.Media.SIZE};
-        try {
-            Cursor cursor = getContentResolver().query(
-                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,
-                    condition, null, null);
-            if (cursor != null) {
-                boolean isDataPresent = cursor.moveToFirst();
-                if (isDataPresent) {
-                    do {
-                        Log.e(TAG, cursor.getString(cursor.getColumnIndex(uri)));
-                    } while (cursor.moveToNext());
-                }
-                if (cursor != null) {
-                    cursor.close();
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+//    private void getImages() {
+//        Log.d(TAG, "getImages: ");
+//        String uri = MediaStore.Images.Media.DATA;
+//        // if GetImageFromThisDirectory is the name of the directory from which image will be retrieved
+//        String condition = uri + "/testfolder";
+//        String[] projection = {uri, MediaStore.Images.Media.DATE_ADDED,
+//                MediaStore.Images.Media.SIZE};
+//        try {
+//            Cursor cursor = getContentResolver().query(
+//                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,
+//                    condition, null, null);
+//            if (cursor != null) {
+//                boolean isDataPresent = cursor.moveToFirst();
+//                if (isDataPresent) {
+//                    do {
+//                        Log.e(TAG, cursor.getString(cursor.getColumnIndex(uri)));
+//                    } while (cursor.moveToNext());
+//                }
+//                if (cursor != null) {
+//                    cursor.close();
+//                }
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     //    public String getRealPathFromURI(Context context, Uri contentUri) {
 //        Cursor cursor = null;
@@ -203,6 +208,34 @@ public class MainActivity extends AppCompatActivity {
 //        cursor.close();
 //        return result;
 //    }
+
+    void initFab() {
+//        fab = new Fab(fabView, list, prefs.getBoolean(PREF_FAB_EXPANSION_BEHAVIOR, false));
+//        fab.setOnFabItemClickedListener(id -> {
+//            View v = mainActivity.findViewById(id);
+//            switch (id) {
+//                case R.id.fab_expand_menu_button:
+//                    editNote(new Note(), v);
+//                    break;
+//                case R.id.fab_note:
+//                    editNote(new Note(), v);
+//                    break;
+//                case R.id.fab_camera:
+//                    Intent i = mainActivity.getIntent();
+//                    i.setAction(ACTION_FAB_TAKE_PHOTO);
+//                    mainActivity.setIntent(i);
+//                    editNote(new Note(), v);
+//                    break;
+//                case R.id.fab_checklist:
+//                    Note note = new Note();
+//                    note.setChecklist(true);
+//                    editNote(note, v);
+//                    break;
+//            }
+//        });
+
+//        fabView.setOn
+    }
 
 
 }
