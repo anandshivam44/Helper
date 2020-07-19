@@ -1,16 +1,24 @@
 package com.voyager.helper;
 
 import android.Manifest;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -20,19 +28,28 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.voyager.helper.Adapters.GalleryAdapter;
+import com.yalantis.myCustom_ucrop.UCrop;
+import com.yalantis.myCustom_ucrop.UCropFragment;
+import com.yalantis.myCustom_ucrop.UCropFragmentCallback;
 
 import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements UCropFragmentCallback {
 
     private static final String TAG = "MyTag";
     @BindView(R.id.recyclerView_grid)
     RecyclerView recyclerViewGrid;
+    final int CAPTURE_IMAGE = 0, CHOOSE_FROM_GALLERY = 101;
+
     //    Fab fab;
     FloatingActionsMenu fabView;
     FloatingActionButton fab1;
@@ -46,6 +63,9 @@ public class MainActivity extends AppCompatActivity {
     ///storage/emulated/0/testfolder
 
     private GalleryAdapter adapter;
+    Uri selected_image_uri;
+    Uri imageUri;
+    public static String mCurrentPhotoPath;
 
 
     @Override
@@ -60,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(MainActivity.this, "Item_1 Clicked", Toast.LENGTH_SHORT).show();
+                selectImage(MainActivity.this);
             }
         });
 
@@ -70,6 +91,7 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "Item_2 Clicked", Toast.LENGTH_SHORT).show();
             }
         });
+        fab3 = findViewById(R.id.fab_item_3);
         fab3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -136,7 +158,7 @@ public class MainActivity extends AppCompatActivity {
         List<File> trying = getListFiles(new File(parentDir));
         if (trying.size() > 0) {
             for (int i = 0; i < trying.size(); i++) {
-                Log.d(TAG, "Name " + trying.get(i).getName() + " Absolute Path " + trying.get(i).getAbsolutePath() + " URI= " + trying.get(i).toURI());
+//                Log.d(TAG, "Name " + trying.get(i).getName() + " Absolute Path " + trying.get(i).getAbsolutePath() + " URI= " + trying.get(i).toURI());
                 images.add(trying.get(i).toURI().toString());
                 imageName.add(trying.get(i).getName());
             }
@@ -157,85 +179,165 @@ public class MainActivity extends AppCompatActivity {
         return inFiles;
     }
 
-//    private void getImages() {
-//        Log.d(TAG, "getImages: ");
-//        String uri = MediaStore.Images.Media.DATA;
-//        // if GetImageFromThisDirectory is the name of the directory from which image will be retrieved
-//        String condition = uri + "/testfolder";
-//        String[] projection = {uri, MediaStore.Images.Media.DATE_ADDED,
-//                MediaStore.Images.Media.SIZE};
-//        try {
-//            Cursor cursor = getContentResolver().query(
-//                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, projection,
-//                    condition, null, null);
-//            if (cursor != null) {
-//                boolean isDataPresent = cursor.moveToFirst();
-//                if (isDataPresent) {
-//                    do {
-//                        Log.e(TAG, cursor.getString(cursor.getColumnIndex(uri)));
-//                    } while (cursor.moveToNext());
-//                }
-//                if (cursor != null) {
-//                    cursor.close();
-//                }
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//    }
 
-    //    public String getRealPathFromURI(Context context, Uri contentUri) {
-//        Cursor cursor = null;
-//        try {
-//            String[] proj = { MediaStore.Images.Media.DATA };
-//            cursor = context.getContentResolver().query(contentUri,  proj, null, null, null);
-//            int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-//            cursor.moveToFirst();
-//            return cursor.getString(column_index);
-//        } finally {
-//            if (cursor != null) {
-//                cursor.close();
-//            }
-//        }
-//    }
-//    private String getRealPathFromURI(Uri contentUri) {
-//        String[] proj = { MediaStore.Images.Media.DATA };
-//        CursorLoader loader = new CursorLoader(mContext, contentUri, proj, null, null, null);
-//        Cursor cursor = loader.loadInBackground();
-//        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
-//        cursor.moveToFirst();
-//        String result = cursor.getString(column_index);
-//        cursor.close();
-//        return result;
-//    }
+    private void selectImage(Context context) {
+        final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
 
-    void initFab() {
-//        fab = new Fab(fabView, list, prefs.getBoolean(PREF_FAB_EXPANSION_BEHAVIOR, false));
-//        fab.setOnFabItemClickedListener(id -> {
-//            View v = mainActivity.findViewById(id);
-//            switch (id) {
-//                case R.id.fab_expand_menu_button:
-//                    editNote(new Note(), v);
-//                    break;
-//                case R.id.fab_note:
-//                    editNote(new Note(), v);
-//                    break;
-//                case R.id.fab_camera:
-//                    Intent i = mainActivity.getIntent();
-//                    i.setAction(ACTION_FAB_TAKE_PHOTO);
-//                    mainActivity.setIntent(i);
-//                    editNote(new Note(), v);
-//                    break;
-//                case R.id.fab_checklist:
-//                    Note note = new Note();
-//                    note.setChecklist(true);
-//                    editNote(note, v);
-//                    break;
-//            }
-//        });
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("Choose a picture");
 
-//        fabView.setOn
+        builder.setItems(options, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int item) {
+
+                if (options[item].equals("Take Photo")) {
+
+
+                    Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                    startActivityForResult(takePicture, CAPTURE_IMAGE);
+
+                } else if (options[item].equals("Choose from Gallery")) {
+//                    Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                    startActivityForResult(pickPhoto, CHOOSE_FROM_GALLERY);//one can be replaced with any action code
+
+                    Intent intent = new Intent(Intent.ACTION_GET_CONTENT)
+                            .setType("image/*")
+                            .addCategory(Intent.CATEGORY_OPENABLE);
+
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                        String[] mimeTypes = {"image/jpeg", "image/png"};
+                        intent.putExtra(Intent.EXTRA_MIME_TYPES, mimeTypes);
+                    }
+
+                    startActivityForResult(Intent.createChooser(intent, "Select Picture"), CHOOSE_FROM_GALLERY);
+
+
+                } else if (options[item].equals("Cancel")) {
+                    dialog.dismiss();
+                }
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        Log.d(TAG, "onActivityResult: +Requestcode :" + requestCode + " resultcode :" + resultCode + " data=" + String.valueOf(data) + " -- " + imageUri + " " + data.getData());
+
+        if (resultCode != RESULT_CANCELED) {
+            switch (requestCode) {
+                case CAPTURE_IMAGE:
+                    if (resultCode == RESULT_OK && data != null) {
+//                        Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
+////                        imageView.setImageBitmap(selectedImage);
+//                        selected_image_uri = data.getData();
+//                        Log.d(TAG, "onActivityResult: After Camera URI = " + data.getData());
+
+
+                        Bitmap selectedImage = (Bitmap) data.getExtras().get("data");
+                        selected_image_uri = data.getData();
+                        Log.d(TAG, "onActivityResult: After Camera URI = " + data.getData());
+
+
+                        startcrop(selected_image_uri);
+                    }
+
+                    break;
+                case CHOOSE_FROM_GALLERY:
+                    if (resultCode == RESULT_OK && data != null) {
+                        Uri selectedImage = data.getData();
+                        selected_image_uri = data.getData();
+                        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+                        if (selectedImage != null) {
+                            Cursor cursor = getContentResolver().query(selectedImage,
+                                    filePathColumn, null, null, null);
+                            if (cursor != null) {
+                                cursor.moveToFirst();
+
+                                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                                String picturePath = cursor.getString(columnIndex);
+//                                imageView.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+                                cursor.close();
+                                startcrop(selected_image_uri);
+                            }
+                        }
+
+                    }
+                    break;
+                case UCrop.REQUEST_CROP:
+                    handleCropResult(data);
+                    break;
+                case UCrop.RESULT_ERROR:
+                    handleCropError(data);
+            }
+        }
+
+    }
+
+    private void handleCropError(Intent data) {
+        final Throwable cropError = UCrop.getError(data);
+        if (cropError != null) {
+            Toast.makeText(this, cropError.getMessage(), Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(this, "unexpected error", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void handleCropResult(Intent data) {
+        final Uri resultUri = UCrop.getOutput(data);
+        if (resultUri != null) {
+//            imageView.setImageURI(resultUri);
+            Log.d(TAG, "handleCropResult: CROP SUCCESSFULL bale bale URI=" + resultUri);
+        } else {
+            Toast.makeText(this, "can not retrieve crop image", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void startcrop(Uri uri) {
+        String destinationFileName = new StringBuilder(UUID.randomUUID().toString()).append(".jpg").toString();
+
+        UCrop ucrop = UCrop.of(uri, Uri.fromFile(new File(getCacheDir(), destinationFileName)));
+        ucrop.start(MainActivity.this);
+    }
+
+    private File createImageFile() throws IOException {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(imageFileName, ".jpg", storageDir);
+
+        mCurrentPhotoPath = image.getAbsolutePath();
+        return image;
     }
 
 
+    @Override
+    public void loadingProgress(boolean showLoader) {
+
+    }
+
+    @Override
+    public void onCropFinish(UCropFragment.UCropResult result) {
+        switch (result.mResultCode) {
+            case RESULT_OK:
+                handleCropResult(result.mResultData);
+                break;
+            case UCrop.RESULT_ERROR:
+                handleCropError(result.mResultData);
+                break;
+        }
+//        removeFragmentFromScreen();
+    }
+
+
+//    public void removeFragmentFromScreen() {
+//        getSupportFragmentManager().beginTransaction()
+//                .remove(fragment)
+//                .commit();
+//        toolbar.setVisibility(View.GONE);
+//        settingsView.setVisibility(View.VISIBLE);
+//    }
 }

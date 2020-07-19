@@ -1,2 +1,5 @@
+include ':mylibrary_shivam'
+include ':sample'
+include ':ucrop'
 include ':app'
 rootProject.name = "Helper"
